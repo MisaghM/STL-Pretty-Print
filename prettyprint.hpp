@@ -86,8 +86,8 @@ namespace ptuple {
     using index_sequence_for = make_index_sequence<sizeof...(T)>;
 #endif
 
-    template <class Tuple, std::size_t... Is>
-    inline void print(std::ostream& os, const Tuple& tuple, index_sequence<Is...>) {
+    template <class CharT, class CharTraits, class Tuple, std::size_t... Is>
+    inline void print(std::basic_ostream<CharT, CharTraits>& os, const Tuple& tuple, index_sequence<Is...>) {
     #if __cplusplus >= 201703L
         ((void)(os << (Is == 0 ? "" : ", ") << std::get<Is>(tuple)), ...);
     #else
