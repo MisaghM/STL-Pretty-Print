@@ -109,7 +109,7 @@ operator<<(std::basic_ostream<CharT, CharTraits>& os, const Container& container
     const auto end = std::end(container);
     os << '[';
     if (itr != end) {
-        while(true) {
+        while (true) {
             os << *itr;
             if (++itr == end) break;
             os << ", ";
