@@ -62,7 +62,7 @@ namespace detail {
     template <class T>
     using is_array = std::integral_constant<bool, std::is_array<T>::value &&
                                                   !is_character<typename remove_all<T>::type>::value>;
-    //ostream operator<< for array of char is overloaded in std.
+    // ostream operator<< for array of characters is overloaded in std.
 
 } // namespace detail
 
@@ -86,8 +86,8 @@ namespace ptuple {
     using index_sequence_for = make_index_sequence<sizeof...(T)>;
 #endif
 
-    template <class CharT, class CharTraits, class Tuple, std::size_t... Is>
-    inline void print(std::basic_ostream<CharT, CharTraits>& os, const Tuple& tuple, index_sequence<Is...>) {
+    template <class CharT, class Traits, class Tuple, std::size_t... Is>
+    inline void print(std::basic_ostream<CharT, Traits>& os, const Tuple& tuple, index_sequence<Is...>) {
     #if __cplusplus >= 201703L
         ((void)(os << (Is == 0 ? "" : ", ") << std::get<Is>(tuple)), ...);
     #else
@@ -100,14 +100,14 @@ namespace ptuple {
 
 } // namespace pprint
 
-template <class CharT, class CharTraits, class Container,
+template <class CharT, class Traits, class Container,
           class = typename std::enable_if<pprint::detail::is_container<Container>::value ||
                                           pprint::detail::is_array<Container>::value>::type>
-inline std::basic_ostream<CharT, CharTraits>&
-operator<<(std::basic_ostream<CharT, CharTraits>& os, const Container& container) {
+inline std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& os, const Container& container) {
     auto itr = std::begin(container);
     const auto end = std::end(container);
-    os << '[';
+    os << static_cast<CharT>('[');
     if (itr != end) {
         while (true) {
             os << *itr;
@@ -115,21 +115,21 @@ operator<<(std::basic_ostream<CharT, CharTraits>& os, const Container& container
             os << ", ";
         }
     }
-    return os << ']';
+    return os << static_cast<CharT>(']');
 }
 
-template <class CharT, class CharTraits, class T, class U>
-inline std::basic_ostream<CharT, CharTraits>&
-operator<<(std::basic_ostream<CharT, CharTraits>& os, const std::pair<T, U>& pair) {
-    return os << '(' << pair.first << ", " << pair.second << ')';
+template <class CharT, class Traits, class T, class U>
+inline std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& os, const std::pair<T, U>& pair) {
+    return os << static_cast<CharT>('(') << pair.first << ", " << pair.second << static_cast<CharT>(')');
 }
 
-template <class CharT, class CharTraits, class... Args>
-inline std::basic_ostream<CharT, CharTraits>&
-operator<<(std::basic_ostream<CharT, CharTraits>& os, const std::tuple<Args...>& tuple) {
-    os << '(';
+template <class CharT, class Traits, class... Args>
+inline std::basic_ostream<CharT, Traits>&
+operator<<(std::basic_ostream<CharT, Traits>& os, const std::tuple<Args...>& tuple) {
+    os << static_cast<CharT>('(');
     pprint::ptuple::print(os, tuple, pprint::ptuple::index_sequence_for<Args...> {});
-    return os << ')';
+    return os << static_cast<CharT>(')');
 }
 
 #endif // PRETTYPRINT_HPP_INCLUDE
